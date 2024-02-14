@@ -27,6 +27,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+main {
+  width: var(--app_width);
+  min-height: 80vh;
+  margin: 0 auto;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}
+
 button {
   border: none;
   cursor: pointer;
@@ -41,5 +52,9 @@ a {
 
 li {
   list-style: none;
+}
+
+input:focus {
+  outline: none;
 }
 </style>

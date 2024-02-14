@@ -1,20 +1,37 @@
 <script setup lang='ts'>
 import { RouterLink } from 'vue-router';
+import { reactive } from 'vue';
 
 defineProps<{
   msg?: string
-}>()
+}>();
+
+const navContent = reactive<{ url: string, name: string }[]>([
+  {
+    url: '/',
+    name: 'home',
+  },
+  {
+    url: '/todo',
+    name: 'todo',
+  },
+  {
+    url: '/calculator',
+    name: 'calculator',
+  }
+]);
 </script>
 
 <template>
   <header>
     <div class='wrapper'>
-      <img alt='Vue logo' class='logo' src='@/assets/logo.svg' width='125' height='125' />
+      <img alt='Vue logo' class='logo' src='@/assets/r-home.jpeg' width='125' height='125' />
 
       <nav>
-        <RouterLink to='/'>Home</RouterLink>
-        <RouterLink to='/calculator'>Calculator</RouterLink>
-        <RouterLink to='/about'>About</RouterLink>
+        <RouterLink v-for='el in navContent' v-bind:key='el.name' v-bind:to='el.url'
+          :class='$route.name === el.name ? "active" : ""'>
+          {{ el.name }}
+        </RouterLink>
       </nav>
     </div>
   </header>
@@ -44,6 +61,8 @@ header {
       height: 40px;
       border-radius: 40px;
       border: 0.5px solid var(--dark);
+      object-fit: cover;
+      object-position: center -7px;
     }
 
     nav {
@@ -56,6 +75,15 @@ header {
 
       a {
         color: black;
+        text-transform: capitalize;
+        padding: 5px;
+        border-radius: 3px;
+        border: 0.5px solid transparent;
+        transition: 300ms;
+
+        &.active {
+          border: 0.5px solid var(--dark);
+        }
       }
     }
   }
