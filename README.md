@@ -1,5 +1,7 @@
 # Rash's Vue Apps
 
-[see deployment](https://rash-vue-apps.vercel.app/)
+<img src='./public/favicon.png' width='50' height='50' alt='favicon' />
 
-![favicon](./public/favicon.png)
+![landing page](./src/assets/home.png)
+
+[see deployment](https://rash-vue-apps.vercel.app/)
