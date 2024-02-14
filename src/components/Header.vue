@@ -63,6 +63,11 @@ header {
       border: 0.5px solid var(--dark);
       object-fit: cover;
       object-position: center -7px;
+
+      @media only screen and (max-width: 600px) {
+        object-fit: cover;
+        object-position: center center;
+      }
     }
 
     nav {

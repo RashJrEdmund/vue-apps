@@ -26,10 +26,12 @@ const handleSubmit = (e: Event) => {
   e.preventDefault();
   if (!todoVal.value.trim()) return;
 
+  const date = new Date();
+
   const newTodo: ITodo = {
     id: crypto.randomUUID(),
     todo: todoVal.value,
-    createdAt: new Date().toDateString(),
+    createdAt: date.toDateString() + ' | ' + date.toLocaleTimeString(),
     completedAt: null,
     isCompleted: false,
   };
@@ -39,8 +41,17 @@ const handleSubmit = (e: Event) => {
   todoVal.value = '';
 };
 
+const handleCompletion = (eve_data: { date: string | null, id: string }) => {
+  for (const i in TODOS) {
+    if (TODOS[i].id === eve_data.id) {
+      TODOS[i].completedAt = eve_data.date;
+      break;
+    };
+  }
+}
+
 const handleHideDone = () => {
-  console.log('todos', TODOS);
+  hideDone.value = !hideDone.value;
 };
 </script>
 
@@ -54,9 +65,9 @@ const handleHideDone = () => {
         <button type='submit'>+</button>
       </form>
 
-      <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' />
+      <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' @completion='handleCompletion' />
 
-      <button v-if='TODOS.length > 0' class='hide-btn' @click='() => hideDone = !hideDone'>
+      <button v-if='TODOS.length > 0' class='hide-btn' @click='handleHideDone'>
         {{ hideDone ? 'Completed Todos have been hidden' : 'Hide completed Todos' }}
       </button>
     </div>
