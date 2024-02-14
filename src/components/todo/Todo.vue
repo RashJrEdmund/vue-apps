@@ -1,17 +1,12 @@
 <script setup lang='ts'>
 import type { ITodo } from '../../interfaces/todo.d';
-import { computed, ref } from 'vue';
 defineProps<{
   todo: ITodo,
 }>();
 
-const emit = defineEmits(['completion']);
+const emit = defineEmits(['completion', 'deletion']);
 
-const checkBoxRef = ref<HTMLInputElement | null>(null);
-
-const _isCompleted = ref(false);
-
-const handleEmission = (e: Event, _todo: ITodo) => {
+const handleCompletionEmission = (e: Event, _todo: ITodo) => {
   if ((e.target as HTMLInputElement).checked) {
     const date = new Date();
 
@@ -24,25 +19,31 @@ const handleEmission = (e: Event, _todo: ITodo) => {
     id: _todo.id,
   });
 }
+
+const handleDeletionEmission = (id: string) => {
+  emit('deletion', { id });
+}
 </script>
 
 <template>
   <div v-bind:class='todo.isCompleted ? "completed todo" : "todo"'>
     <div class='top'>
-      <input type='checkbox' @click='(e: Event) => handleEmission(e, todo)' v-model='todo.isCompleted' />
+      <input type='checkbox' @click='(e: Event) => handleCompletionEmission(e, todo)' v-model='todo.isCompleted' />
 
       <span class='name'>{{ todo.todo }}</span>
     </div>
     <div class='bottom'>
       <span>
-        started At:
-        <span class="date">{{ todo.createdAt }}</span>
+        started at:
+        <span class='date'>{{ todo.createdAt }}</span>
       </span>
 
       <span>
-        completed At:
-        <span class="date completion-date">{{ todo.completedAt || 'Not yet done' }}</span>
+        completed at:
+        <span class='date completion-date'>{{ todo.completedAt || 'Not yet done' }}</span>
       </span>
+
+      <button class='delete-btn' @:click='() => handleDeletionEmission(todo.id)'>delete todo</button>
     </div>
   </div>
 </template>
@@ -72,7 +73,7 @@ const handleEmission = (e: Event, _todo: ITodo) => {
 
     .bottom {
       .completion-date {
-        color: #1d9bf0;
+        color: var(--twitter_blue);
       }
     }
   }
@@ -95,12 +96,30 @@ const handleEmission = (e: Event, _todo: ITodo) => {
     flex-direction: column;
     margin: 10px 0;
     gap: 10px;
-    color: #ffffff83;
+    color: var(--light_tertiary);
 
     .date {
       color: var(--dark);
-      color: #ffffffca;
+      color: var(--light_secondary);
       font-weight: 600;
+    }
+
+    .delete-btn {
+      color: var(--light);
+      align-self: flex-end;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 5px;
+      transition: 300ms;
+      border: 0.5px solid transparent;
+
+      @media only screen and (max-width: 600px) {
+        border: 0.5px solid var(--error);
+      }
+
+      &:hover {
+        border: 0.5px solid var(--error);
+      }
     }
   }
 }

@@ -11,8 +11,16 @@ import Header from './components/Header.vue';
 
 <style>
 :root {
+  --light: #fff;
+  --light_secondary: #ffffffca;
+  --light_tertiary: #ffffff83;
+
   --dark: #242424;
   --app_width: min(97vw, 1224px);
+  --twitter_blue: #1d9bf0;
+  --error: tomato;
+
+  --query_max_width: 600px;
 }
 
 * {
@@ -23,7 +31,7 @@ import Header from './components/Header.vue';
 
 body {
   background-color: var(--dark);
-  color: #fff;
+  color: var(--light);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -39,6 +47,7 @@ main {
 }
 
 button {
+  background: none;
   border: none;
   cursor: pointer;
   width: fit-content;

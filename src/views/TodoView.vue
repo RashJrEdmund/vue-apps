@@ -2,8 +2,9 @@
 import { reactive, ref, computed } from 'vue';
 import type { ITodo } from '../interfaces/todo.d';
 import Todo from '../components/todo/Todo.vue';
+import TodoStats from '../components/todo/TodoStats.vue';
 
-const TODOS = reactive<ITodo[]>([
+const TODOS = ref<ITodo[]>([
   // {
   //   id: crypto.randomUUID(),
   //   todo: 'carry water',
@@ -18,9 +19,9 @@ const todoVal = ref<string>('');
 const hideDone = ref<boolean>(false);
 
 const COMPUTED_TODOS = computed(() => {
-  if (hideDone.value) return TODOS.filter(t => !t.isCompleted);
-  return TODOS;
-})
+  if (hideDone.value) return TODOS.value.filter(t => !t.isCompleted);
+  return TODOS.value;
+});
 
 const handleSubmit = (e: Event) => {
   e.preventDefault();
@@ -36,15 +37,19 @@ const handleSubmit = (e: Event) => {
     isCompleted: false,
   };
 
-  TODOS.push(newTodo);
+  TODOS.value.push(newTodo);
 
   todoVal.value = '';
 };
 
-const handleCompletion = (eve_data: { date: string | null, id: string }) => {
-  for (const i in TODOS) {
-    if (TODOS[i].id === eve_data.id) {
-      TODOS[i].completedAt = eve_data.date;
+const deletedTodo = (event_data: { id: string }) => {
+  TODOS.value = TODOS.value.filter(t => t.id !== event_data.id);
+};
+
+const handleCompletion = (event_data: { date: string | null, id: string }) => {
+  for (const i in TODOS.value) {
+    if (TODOS.value[i].id === event_data.id) {
+      TODOS.value[i].completedAt = event_data.date;
       break;
     };
   }
@@ -65,16 +70,19 @@ const handleHideDone = () => {
         <button type='submit'>+</button>
       </form>
 
-      <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' @completion='handleCompletion' />
+      <TodoStats :TODOS='TODOS' :showing='COMPUTED_TODOS.length' />
+
+      <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' @completion='handleCompletion'
+        @deletion='deletedTodo' />
 
       <button v-if='TODOS.length > 0' class='hide-btn' @click='handleHideDone'>
-        {{ hideDone ? 'Completed Todos have been hidden' : 'Hide completed Todos' }}
+        {{ hideDone ? 'Show All' : 'Hide Completed Todos' }}
       </button>
     </div>
   </main>
 </template>
 
-<style lang='scss'>
+<style scoped lang='scss'>
 main {
   .container {
     width: min(100%, 600px);
@@ -102,6 +110,7 @@ main {
     }
 
     .hide-btn {
+      background-color: var(--light_secondary);
       align-self: start;
       padding: 10px;
       border-radius: 5px;
@@ -111,7 +120,7 @@ main {
       &:hover {
         background-color: var(--dark);
         border: 0.5px solid gray;
-        color: #fff;
+        color: var(--light);
       }
     }
   }
