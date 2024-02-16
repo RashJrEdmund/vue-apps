@@ -30,7 +30,7 @@ const handleInputChange = (e: Event) => {
   const value = (e.target as HTMLInputElement).value;
   const regex = new RegExp(`[^0-9${ARR_OPERATORS.join('')}]`, 'g'); // returns /[^0-9/*-+]/g;
 
-  const wrongMatch = value.match(regex); // anything that's none of these.
+  const wrongMatch = value.match(regex); // anything that's none of these.  /[^0-9/*-+]/g;
   console.log({ wrongMatch });
 
   if (wrongMatch) {
