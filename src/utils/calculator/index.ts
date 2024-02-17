@@ -35,8 +35,6 @@ function evaluateExpression(first: number, second: number, operator: IOperators)
     }
   };
 
-  console.log({ first, second, operator, answer });
-
   return {
     answer,
     errorMsg: '',

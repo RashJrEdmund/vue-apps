@@ -24,7 +24,17 @@ const computedDisplay = computed(() => {
   return left + operator + right;
 });
 
+const showFlash = ref<boolean>(false);
+
+const flashCalculator = () => { // to animate the blink on the field
+  showFlash.value = true;
+  setTimeout(() => {
+    showFlash.value = false;
+  }, 300); // 300ms
+};
+
 const handleEvaluation = () => {
+  flashCalculator();
   if (!tracker.value.left || !tracker.value.right) return;
 
   const left = +tracker.value.left;
@@ -45,6 +55,24 @@ const handleEvaluation = () => {
   tracker.value.right = '';
 };
 
+const handleDecimalInput = () => {
+  if (tracker.value.operator) { // means should add to the right;
+    if (tracker.value.right.includes('.')) return; // checking if already there.
+
+    if (!tracker.value.right) { // checking if there's nothing yet written on the right.
+      tracker.value.right += '0.';
+      return;
+    }
+
+    tracker.value.right += '.';
+    return;
+  };
+
+  if (tracker.value.left.includes('.')) return;
+
+  tracker.value.left += '.';
+};
+
 const handleNumberPress = (event_data: { value: string }) => {
   if (formError.value) formError.value = null;
 
@@ -55,7 +83,7 @@ const handleNumberPress = (event_data: { value: string }) => {
 
   if (tracker.value.operator) { // an operator was selected already.
     if (event_data.value === '.') {
-      tracker.value.right += event_data.value;
+      handleDecimalInput();
       return;
     };
 
@@ -64,7 +92,7 @@ const handleNumberPress = (event_data: { value: string }) => {
   }
 
   if (event_data.value === '.') {
-    tracker.value.left += event_data.value;
+    handleDecimalInput();
     return;
   };
 
@@ -128,7 +156,7 @@ const handleAllClear = () => {
     <h1>Calculator App</h1>
 
     <div class='container'>
-      <div class='top-section'>
+      <div v-bind:class='showFlash ? "top-section flash" : "top-section"'>
         <div class='input-display'>
           {{ computedDisplay }}
           <span v-if='formError?.error' class='error'>{{ formError?.message }}</span>
@@ -137,8 +165,12 @@ const handleAllClear = () => {
         <div class='answer'>{{ displayAnswer }}</div>
       </div>
 
-      <KeyPad @num-press='handleNumberPress' @operator-press='handleOperatorPress' @delete='handleDel'
-        @all-clear='handleAllClear' />
+      <KeyPad
+        @num-press='handleNumberPress'
+        @operator-press='handleOperatorPress'
+        @delete='handleDel'
+        @all-clear='handleAllClear'
+      />
     </div>
   </main>
 </template>
@@ -146,7 +178,7 @@ const handleAllClear = () => {
 <style scoped lang='scss'>
 main {
   .container {
-    width: min(100%, 600px);
+    width: min(100%, 400px);
     margin: 2.2rem auto 0;
     display: flex;
     flex-direction: column;
@@ -160,6 +192,10 @@ main {
       justify-content: start;
       border: 0.5px solid var(--light_secondary);
       word-break: break-all;
+
+      &.flash {
+        border: 0.5px solid var(--twitter_blue);
+      }
 
       .input-display {
         background-color: black;
