@@ -1,51 +1,38 @@
 <script setup lang='ts'>
 import { ref, reactive, watch } from 'vue';
+import KeyPad from '@/components/calculator/KeyPad.vue';
+
 const formError = ref<{ error: boolean, message: string } | null>(null);
-const inputVal = ref<string>('');
+const inputVal = ref<string>('0');
 
 const answer = ref<string>('0');
 
-const ARR_OPERATORS = ['/', '*', '-', '+'];
+const ARR_OPERATORS = ['x', '/', '*', '-', '+'];
 
-const handleSubmit = (e: Event) => {
-  e.preventDefault();
+const handleNumberPress = (event_data: { value: string }) => {
+  console.log(event_data);
+  if (event_data.value === '=') {
+    // evaluate inputVal
+    return;
+  };
 
-  if (inputVal.value.length <= 1) return;
+  if (inputVal.value === '0' || !inputVal.value) {
+    inputVal.value = event_data.value;
+  };
 
-  const regex = new RegExp(`^\\d([\\d${ARR_OPERATORS.join('')}]*)?\\d$`, 'g'); // returns /^\d([\d/*-+]*)?\d$/g. wrote it myself. if it starts and ends with digit;
+  inputVal.value += event_data.value;
+}
 
-  if (!regex.test(inputVal.value)) {
-    formError.value = {
-      error: true,
-      message: 'Expression must start and end with a digit',
-    }
+const handleOperatorPress = (event_data: { value: string }) => {
+  console.log(event_data)
 
+  if (ARR_OPERATORS.includes(inputVal.value.trim().slice(-1))) {
     return;
   }
 
-  formError.value = null;
-};
-
-const handleInputChange = (e: Event) => {
-  const value = (e.target as HTMLInputElement).value;
-  const regex = new RegExp(`[^0-9${ARR_OPERATORS.join('')}]`, 'g'); // returns /[^0-9/*-+]/g;
-
-  const wrongMatch = value.match(regex); // anything that's none of these.  /[^0-9/*-+]/g;
-  console.log({ wrongMatch });
-
-  if (wrongMatch) {
-    formError.value = {
-      error: true,
-      message: 'Invalid character "' + wrongMatch.join(',') + `" detected . only numbers and operators (${ARR_OPERATORS.join(' ')}) are allowed`,
-    }
-
-    return;
-  }
-
-  formError.value = null;
-
-  inputVal.value = value;
-};
+  inputVal.value += event_data.value;
+  //
+}
 //
 </script>
 
@@ -55,23 +42,27 @@ const handleInputChange = (e: Event) => {
 
     <div class='container'>
       <div class='top-section'>
-        <form @submit='handleSubmit'>
-          <input type='text' placeholder='0' @:input='handleInputChange' v-bind:value='inputVal'>
-
+        <div class='input-display'>
+          {{ inputVal }}
           <span v-if='formError?.error' class='error'>{{ formError?.message }}</span>
-        </form>
+        </div>
 
         <div class='answer'>{{ answer }}</div>
       </div>
+
+      <KeyPad @num-press='handleNumberPress' @operator-press='handleOperatorPress' />
     </div>
   </main>
 </template>
 
 <style scoped lang='scss'>
 main {
-
   .container {
     width: min(100%, 600px);
+    margin: 2.2rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     .top-section {
       width: 100%;
@@ -79,28 +70,27 @@ main {
       flex-direction: column;
       align-items: center;
       justify-content: start;
+      border: 0.5px solid var(--light_secondary);
+      word-break: break-all;
 
-      form {
+      .input-display {
+        background-color: black;
         width: 100%;
         height: fit-content;
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
         border-radius: 5px;
-        margin: 3rem 0 0;
         position: relative;
-
-        input {
-          width: 100%;
-          padding: 3rem 10px 10px;
-          font-size: 1.2rem;
-        }
+        width: 100%;
+        padding: 3rem 10px 10px;
+        font-size: 1.2rem;
 
         .error {
           color: var(--error);
           position: absolute;
           left: 0;
-          top: -5px; //calc(100% + 5px);
+          top: -5px;
           transform: translateY(-100%);
           font-size: 0.9rem;
           font-size: 400;
@@ -109,13 +99,13 @@ main {
 
       .answer {
         background-color: var(--dark);
-        border: 0.5px solid var(--light_secondary);
+        border-top: 0.5px solid var(--light_secondary);
         width: calc(100% - 1px);
         text-align: right;
-        margin: 0 auto 2rem;
         padding: 10px;
         height: fit-content;
         min-height: 80px;
+        word-break: break-all;
       }
     }
   }

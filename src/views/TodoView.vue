@@ -55,6 +55,10 @@ const handleCompletion = (event_data: { date: string | null, id: string }) => {
   }
 }
 
+const handleDeleteAllCompleted = () => {
+  TODOS.value = TODOS.value.filter(t => !t.isCompleted);
+};
+
 const handleHideDone = () => {
   hideDone.value = !hideDone.value;
 };
@@ -66,7 +70,7 @@ const handleHideDone = () => {
 
     <div class='container'>
       <form @submit='handleSubmit'>
-        <input type='text' name='' placeholder='Enter Todo' v-model='todoVal'>
+        <input type='text' name='' placeholder='Add Task' v-model='todoVal'>
         <button type='submit'>+</button>
       </form>
 
@@ -75,9 +79,15 @@ const handleHideDone = () => {
       <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' @completion='handleCompletion'
         @deletion='deletedTodo' />
 
-      <button v-if='TODOS.length > 0' class='hide-btn' @click='handleHideDone'>
-        {{ hideDone ? 'Show All' : 'Hide Completed Todos' }}
-      </button>
+      <section class='base_cta_btns'>
+        <button v-if='TODOS.length > 0' class='hide-btn' @click='handleHideDone'>
+          {{ hideDone ? 'Show All' : 'Hide Completed Todos' }}
+        </button>
+
+        <button v-if='TODOS.filter(t => t.isCompleted).length > 0' class='delete-all-btn' @click='handleDeleteAllCompleted'>
+          Delete All Completed
+        </button>
+      </section>
     </div>
   </main>
 </template>
@@ -109,18 +119,38 @@ main {
       }
     }
 
-    .hide-btn {
-      background-color: var(--light_secondary);
-      align-self: start;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 2rem 0 0;
-      transition: 300ms;
+    .base_cta_btns {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      gap: 1rem;
 
-      &:hover {
-        background-color: var(--dark);
-        border: 0.5px solid gray;
-        color: var(--light);
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 2rem 0;
+
+        &.hide-btn {
+          background-color: var(--light_secondary);
+          transition: 300ms;
+
+          &:hover {
+            background-color: var(--dark);
+            border: 0.5px solid gray;
+            color: var(--light);
+          }
+        }
+
+        &.delete-all-btn {
+          background-color: transparent;
+          border: 0.5px solid red;
+          color: var(--light);
+        }
       }
     }
   }

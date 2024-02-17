@@ -30,6 +30,8 @@ const todoCount = computed(() => {
     <span class="showing">
       Showing
       <span>{{ props.showing }}</span>
+      /
+      {{ todoCount.length }}
     </span>
   </div>
 </template>

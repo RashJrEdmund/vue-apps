@@ -29,6 +29,10 @@ import Header from './components/Header.vue';
   box-sizing: border-box;
 }
 
+*:hover {
+  outline: none;
+}
+
 body {
   background-color: var(--dark);
   color: var(--light);
