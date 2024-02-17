@@ -1,40 +1,27 @@
 <script setup lang='ts'>
-// const ARR_OPERATORS = ['+', '-', '*', '/'];
-const emits = defineEmits(['numPress', 'operatorPress', 'AC', 'delete']);
+import type { IOperators } from '@/interfaces/calculator';
 
-const ARR_OPERATORS = [
-  {
-    visual: '+',
-    value: '+',
-  },
-  {
-    visual: '-',
-    value: '-',
-  },
-  {
-    visual: 'x',
-    value: 'x',
-  },
-  {
-    visual: '÷',
-    value: '/'
-  }
-];
+// const ARR_OPERATORS = ['+', '-', '*', '/'];
+const emits = defineEmits(['numPress', 'operatorPress', 'allClear', 'delete']);
+
+const ARR_OPERATORS: IOperators[] = ['÷', 'x', '-', '+'];
 
 const ARR_TOP_ACTIONS = [
   {
-    visual: 'AC',
-    value: '+',
-    action: () => emits('AC'),
+    value: 'AC',
+    action: () => emits('allClear'),
   },
   {
-    visual: 'Del',
-    value: '-',
+    value: 'Del',
     action: () => emits('delete'),
+  },
+  {
+    value: '%',
+    action: () => emits('operatorPress', { value: '%' }),
   }
 ];
 
-const ARR_NUMBERS: Array<string> = ['=', ...new Array(10).fill(null).map((_, i) => {
+const ARR_NUMBERS: Array<string> = ['=', '.', ...new Array(10).fill(null).map((_, i) => {
   return String.fromCharCode(48 + i); // String.fromCharCode(48) === '0' hence 0 - 9
 })];
 
@@ -54,8 +41,8 @@ const handleOperatorPress = (value: number | string) => {
 
 <template>
   <section class='top-actions'>
-    <button v-for='{ visual, value, action } in ARR_TOP_ACTIONS' v-bind:key='visual' @click='action'>
-      {{ visual }}
+    <button v-for='{ value, action } in ARR_TOP_ACTIONS' v-bind:key='value' @click='action'>
+      {{ value }}
     </button>
   </section>
 
@@ -67,8 +54,8 @@ const handleOperatorPress = (value: number | string) => {
     </div>
 
     <div class='operators'>
-      <button v-for='{ visual, value } in ARR_OPERATORS' v-bind:key='visual' @click='() => handleOperatorPress(value)'>
-        {{ visual }}
+      <button v-for='operator in ARR_OPERATORS' v-bind:key='operator' @click='() => handleOperatorPress(operator)'>
+        {{ operator }}
       </button>
     </div>
   </div>
@@ -78,15 +65,22 @@ const handleOperatorPress = (value: number | string) => {
 .top-actions {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: end;
   gap: 5px;
 
   button {
-    background-color: brown;
+    background-color: #000;
     width: 100%;
+    padding: 5px;
     height: 100%;
     font-weight: 600;
     font-size: 1.4rem;
+    color: var(--light);
+
+    &:nth-of-type(1),
+    &:nth-of-type(2) {
+      background-color: brown;
+    }
   }
 }
 
@@ -115,10 +109,6 @@ const handleOperatorPress = (value: number | string) => {
       width: 100%;
       height: 100%;
       padding: 1rem 0;
-
-      &:nth-last-child(2) {
-        grid-column: 1 / span 2;
-      }
 
       &:nth-child(2n) {
         /* background-color: brown; */

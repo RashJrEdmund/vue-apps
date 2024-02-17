@@ -1,39 +1,126 @@
 <script setup lang='ts'>
-import { ref, reactive, watch } from 'vue';
+import type { IOperators } from '@/interfaces/calculator';
+import { ref, computed } from 'vue';
+import { evaluateExpression } from '../utils/calculator/index.ts';
 import KeyPad from '@/components/calculator/KeyPad.vue';
 
 const formError = ref<{ error: boolean, message: string } | null>(null);
-const inputVal = ref<string>('0');
 
-const answer = ref<string>('0');
+const ARR_OPERATORS: IOperators[] = ['+', '-', 'x', '÷', '%'];
 
-const ARR_OPERATORS = ['x', '/', '*', '-', '+'];
+const displayAnswer = ref<string | number>(0);
 
-const handleNumberPress = (event_data: { value: string }) => {
-  console.log(event_data);
-  if (event_data.value === '=') {
-    // evaluate inputVal
-    return;
-  };
+const tracker = ref<{
+  left: string;
+  right: string;
+  operator: IOperators | ''
+}>({ left: '0', right: '', operator: '' });
 
-  if (inputVal.value === '0' || !inputVal.value) {
-    inputVal.value = event_data.value;
-  };
+const computedDisplay = computed(() => {
+  const left = tracker.value.left;
+  const right = tracker.value.right;
+  const operator = tracker.value.operator;
 
-  inputVal.value += event_data.value;
-}
+  return left + operator + right;
+});
 
-const handleOperatorPress = (event_data: { value: string }) => {
-  console.log(event_data)
+const handleEvaluation = () => {
+  if (!tracker.value.left || !tracker.value.right) return;
 
-  if (ARR_OPERATORS.includes(inputVal.value.trim().slice(-1))) {
+  const left = +tracker.value.left;
+  const right = +tracker.value.right;
+
+  if (isNaN(left) || isNaN(right)) return;
+
+  const res = evaluateExpression(left, right, tracker.value.operator as IOperators);
+
+  if (res.errorMsg) {
+    // handle error;
     return;
   }
 
-  inputVal.value += event_data.value;
-  //
+  displayAnswer.value = res.answer;
+  tracker.value.left = String(res.answer);
+  tracker.value.operator = '';
+  tracker.value.right = '';
+};
+
+const handleNumberPress = (event_data: { value: string }) => {
+  if (formError.value) formError.value = null;
+
+  if (event_data.value === '=') {
+    handleEvaluation();
+    return;
+  };
+
+  if (tracker.value.operator) { // an operator was selected already.
+    if (event_data.value === '.') {
+      tracker.value.right += event_data.value;
+      return;
+    };
+
+    tracker.value.right += event_data.value;
+    return;
+  }
+
+  if (event_data.value === '.') {
+    tracker.value.left += event_data.value;
+    return;
+  };
+
+  if (tracker.value.left === '0' || !tracker.value.left) {
+    tracker.value.left = event_data.value;
+    return;
+  };
+
+  tracker.value.left += event_data.value;
 }
-//
+
+const handleOperatorPress = (event_data: { value: string }) => {
+  if (tracker.value.operator && tracker.value.right) {
+    handleEvaluation();
+
+    tracker.value.operator = event_data.value as IOperators;
+    return;
+  }
+
+  tracker.value.operator = event_data.value as IOperators;
+}
+
+const handleDel = () => {
+  if (tracker.value.right) {
+    tracker.value.right = tracker.value.right.slice(0, -1);
+    return;
+  };
+
+  if (tracker.value.operator) {
+    tracker.value.operator = '';
+    return;
+  };
+
+  if (tracker.value.left.length <= 1) {
+    tracker.value.left = '0';
+    return;
+  }
+
+  const lastVal = computedDisplay.value.slice(-1);
+
+  if (ARR_OPERATORS.includes(lastVal as IOperators)) { // meaning last val is an operator sign;
+    tracker.value.operator = '';
+    return;
+  }
+
+  tracker.value.left = tracker.value.left.slice(0, -1);
+  return;
+}
+
+const handleAllClear = () => {
+  tracker.value.left = '0';
+  tracker.value.right = '';
+  tracker.value.operator = '';
+
+  displayAnswer.value = '';
+}
 </script>
 
 <template>
@@ -43,14 +130,15 @@ const handleOperatorPress = (event_data: { value: string }) => {
     <div class='container'>
       <div class='top-section'>
         <div class='input-display'>
-          {{ inputVal }}
+          {{ computedDisplay }}
           <span v-if='formError?.error' class='error'>{{ formError?.message }}</span>
         </div>
 
-        <div class='answer'>{{ answer }}</div>
+        <div class='answer'>{{ displayAnswer }}</div>
       </div>
 
-      <KeyPad @num-press='handleNumberPress' @operator-press='handleOperatorPress' />
+      <KeyPad @num-press='handleNumberPress' @operator-press='handleOperatorPress' @delete='handleDel'
+        @all-clear='handleAllClear' />
     </div>
   </main>
 </template>

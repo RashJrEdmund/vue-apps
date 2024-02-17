@@ -112,6 +112,7 @@ const handleDeletionEmission = (id: string) => {
       border-radius: 5px;
       transition: 300ms;
       border: 0.5px solid transparent;
+      color: var(--error);
 
       @media only screen and (max-width: 600px) {
         border: 0.5px solid var(--error);

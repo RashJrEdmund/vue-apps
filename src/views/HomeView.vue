@@ -1,9 +1,9 @@
-<script setup lang="ts">
+<script setup lang='ts'>
 </script>
 
 <template>
   <main>
-    <h2>Welcome to my vue app collection</h2>
+    <h2 class='heading'>Welcome to my vue app collection</h2>
 
     <section>
       <img src='@/assets/r-home.jpeg' />
@@ -11,9 +11,14 @@
   </main>
 </template>
 
-<style scoped>
+<style scoped lang='scss'>
 main {
   justify-content: center;
+
+  .heading {
+    margin: 0 auto;
+    text-align: center;
+  }
 
   section {
     display: flex;

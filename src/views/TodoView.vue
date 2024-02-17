@@ -66,7 +66,7 @@ const handleHideDone = () => {
 
 <template>
   <main>
-    <h1>Create and manage todo's</h1>
+    <h1 class='heading'>Create and manage your todo's</h1>
 
     <div class='container'>
       <form @submit='handleSubmit'>
@@ -79,12 +79,13 @@ const handleHideDone = () => {
       <Todo v-for='todo in COMPUTED_TODOS' v-bind:key='todo.id' v-bind:todo='todo' @completion='handleCompletion'
         @deletion='deletedTodo' />
 
-      <section class='base_cta_btns'>
-        <button v-if='TODOS.length > 0' class='hide-btn' @click='handleHideDone'>
+      <section v-if='TODOS.filter(t => t.isCompleted).length > 0' class='base_cta_btns'>
+        <button class='hide-btn' @click='handleHideDone'>
           {{ hideDone ? 'Show All' : 'Hide Completed Todos' }}
         </button>
 
-        <button v-if='TODOS.filter(t => t.isCompleted).length > 0' class='delete-all-btn' @click='handleDeleteAllCompleted'>
+        <button class='delete-all-btn'
+          @click='handleDeleteAllCompleted'>
           Delete All Completed
         </button>
       </section>
@@ -94,6 +95,11 @@ const handleHideDone = () => {
 
 <style scoped lang='scss'>
 main {
+  .heading {
+    margin: 0 auto;
+    text-align: right;
+  }
+
   .container {
     width: min(100%, 600px);
 
@@ -148,7 +154,7 @@ main {
 
         &.delete-all-btn {
           background-color: transparent;
-          border: 0.5px solid red;
+          border: 0.5px solid var(--error);
           color: var(--light);
         }
       }
