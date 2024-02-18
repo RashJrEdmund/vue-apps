@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { IOperators } from '@/interfaces/calculator';
 import { ref, computed } from 'vue';
-import { evaluateExpression } from '../utils/calculator/index.ts';
+import { evaluateExpression } from '../utils';
 import KeyPad from '@/components/calculator/KeyPad.vue';
 
 const formError = ref<{ error: boolean, message: string } | null>(null);
