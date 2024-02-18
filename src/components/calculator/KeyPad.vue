@@ -110,6 +110,11 @@ const handleOperatorPress = (value: number | string) => {
       height: 100%;
       padding: 1rem 0;
 
+      &:nth-last-child(1) {
+        background-color: #000;
+        color: var(--light_secondary)
+      }
+
       &:nth-child(2n) {
         /* background-color: brown; */
       }
